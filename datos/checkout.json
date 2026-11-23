@@ -1,0 +1,16 @@
+{
+  "clientes": [
+    {
+      "caso": "cliente_uno",
+      "nombre": "Jose",
+      "apellido": "Flores",
+      "codigo_postal": "1000"
+    },
+    {
+      "caso": "cliente_dos",
+      "nombre": "Maria",
+      "apellido": "Garcia",
+      "codigo_postal": "2000"
+    }
+  ]
+}
