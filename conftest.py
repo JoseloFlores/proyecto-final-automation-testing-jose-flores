@@ -1,117 +1,127 @@
-"""Configuración general de pytest y del navegador."""
+# Configuracion de pytest, apertura de Chrome y capturas automaticas
 
 import base64
 import logging
-import re
+import os
 import shutil
 from datetime import datetime
 
 import pytest
 import pytest_html
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service as ServicioChrome
+from webdriver_manager.chrome import ChromeDriverManager as GestorChromeDriver
 
-from utils.config import EVIDENCIAS_DIR, HEADLESS, REPORTS_DIR
+from utilidades.configuracion import CARPETA_EVIDENCIAS, CARPETA_REPORTES, SIN_VENTANA
 
-logger = logging.getLogger(__name__)
-
-
-def _nombre_seguro(texto):
-    """Reemplaza caracteres que no sirven para un nombre de archivo."""
-    return re.sub(r"[^A-Za-z0-9_-]", "_", texto)
+registro = logging.getLogger(__name__)
 
 
-def guardar_captura(driver, nombre_test):
-    """Guarda una captura con fecha, hora y nombre del test."""
-    fecha = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    nombre = f"{fecha}_{_nombre_seguro(nombre_test)}.png"
-    EVIDENCIAS_DIR.mkdir(parents=True, exist_ok=True)
-    ruta = EVIDENCIAS_DIR / nombre
-    driver.save_screenshot(str(ruta))
-    logger.info("Captura guardada en %s", ruta)
-    return ruta
+def limpiar_nombre(texto):
+    # Cambia los caracteres raros por guion bajo para que sirva como nombre de archivo
+    resultado = ""
+    for letra in texto:
+        if letra.isalnum() or letra == "_" or letra == "-":
+            resultado = resultado + letra
+        else:
+            resultado = resultado + "_"
+    return resultado
 
 
-def copiar_captura_a_reportes(ruta):
-    """Copia la captura a la carpeta de reportes."""
-    destino = REPORTS_DIR / "screenshots" / ruta.name
-    destino.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(ruta, destino)
-    return destino
+def sacar_captura(navegador, nombre_prueba):
+    # Guarda la imagen con fecha, hora y el nombre de la prueba
+    fecha_hora = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    nombre_archivo = fecha_hora + "_" + limpiar_nombre(nombre_prueba) + ".png"
+
+    os.makedirs(CARPETA_EVIDENCIAS, exist_ok=True)
+    ruta_imagen = os.path.join(CARPETA_EVIDENCIAS, nombre_archivo)
+    navegador.save_screenshot(ruta_imagen)
+
+    registro.info("Captura guardada en: %s", ruta_imagen)
+    return ruta_imagen
+
+
+def copiar_captura_fallo(ruta_origen):
+    # Copia la captura del fallo dentro de reportes/capturas
+    carpeta_capturas = os.path.join(CARPETA_REPORTES, "capturas")
+    os.makedirs(carpeta_capturas, exist_ok=True)
+    nombre_archivo = os.path.basename(ruta_origen)
+    ruta_destino = os.path.join(carpeta_capturas, nombre_archivo)
+    shutil.copy2(ruta_origen, ruta_destino)
+    return ruta_destino
 
 
 def pytest_configure(config):
-    """Crea las carpetas necesarias antes de ejecutar las pruebas."""
-    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    EVIDENCIAS_DIR.mkdir(parents=True, exist_ok=True)
-    # webdriver-manager es muy hablador; solo mostramos sus advertencias.
+    # Crea las carpetas antes de arrancar las pruebas
+    os.makedirs(CARPETA_REPORTES, exist_ok=True)
+    os.makedirs(CARPETA_EVIDENCIAS, exist_ok=True)
+    # Silenciamos un poco los mensajes largos de webdriver-manager
     logging.getLogger("WDM").setLevel(logging.WARNING)
 
 
 @pytest.fixture(scope="function")
-def driver(request):
-    """Crea un Chrome nuevo para cada test y lo cierra al final."""
-    options = webdriver.ChromeOptions()
+def navegador(request):
+    # Abre un Chrome nuevo para cada prueba y lo cierra al terminar
+    opciones = webdriver.ChromeOptions()
 
-    if HEADLESS:
-        options.add_argument("--headless=new")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
+    if SIN_VENTANA:
+        opciones.add_argument("--headless=new")
+        opciones.add_argument("--no-sandbox")
+        opciones.add_argument("--disable-dev-shm-usage")
 
-    options.add_argument("--window-size=1366,768")
-    # Evita avisos de contraseña guardada que a veces tapan los botones.
-    options.add_argument("--incognito")
-    options.add_experimental_option(
-        "prefs",
-        {
-            "credentials_enable_service": False,
-            "profile.password_manager_enabled": False,
-            "profile.password_manager_leak_detection": False,
-        },
-    )
+    opciones.add_argument("--window-size=1366,768")
+    # Modo incognito y sin avisos de contraseñas para que no tapen los botones
+    opciones.add_argument("--incognito")
+    preferencias = {
+        "credentials_enable_service": False,
+        "profile.password_manager_enabled": False,
+        "profile.password_manager_leak_detection": False,
+    }
+    opciones.add_experimental_option("prefs", preferencias)
 
-    service = ChromeService(ChromeDriverManager().install())
-    navegador = webdriver.Chrome(service=service, options=options)
-    navegador.implicitly_wait(0)
+    servicio = ServicioChrome(GestorChromeDriver().install())
+    chrome = webdriver.Chrome(service=servicio, options=opciones)
+    chrome.implicitly_wait(0)
 
-    logger.info("Navegador iniciado para el test: %s", request.node.name)
+    registro.info("Navegador abierto para: %s", request.node.name)
 
-    yield navegador
+    yield chrome
 
-    fallo = getattr(request.node, "rep_call", None) and request.node.rep_call.failed
+    # Revisamos si la prueba fallo
+    reporte_ejecucion = getattr(request.node, "rep_call", None)
+    fallo = reporte_ejecucion is not None and reporte_ejecucion.failed
 
-    # Si el test pasó, igual guardamos una captura como evidencia.
+    # Si paso bien, igual guardamos una captura de evidencia
     if not fallo:
         try:
-            guardar_captura(navegador, request.node.name)
+            sacar_captura(chrome, request.node.name)
         except Exception as error:
-            logger.warning("No se pudo guardar la evidencia: %s", error)
+            registro.warning("No se pudo guardar la captura de evidencia: %s", error)
 
-    navegador.quit()
-    logger.info("Navegador cerrado")
+    chrome.quit()
+    registro.info("Navegador cerrado")
 
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
-    """Detecta fallos y adjunta la captura al reporte HTML."""
-    outcome = yield
-    report = outcome.get_result()
-    setattr(item, "rep_" + report.when, report)
+    # Si una prueba falla, sacamos captura y la pegamos dentro del reporte HTML
+    resultado = yield
+    reporte = resultado.get_result()
+    setattr(item, "rep_" + reporte.when, reporte)
 
-    if report.when == "call" and report.failed:
-        navegador = item.funcargs.get("driver")
-        if navegador is not None:
+    if reporte.when == "call" and reporte.failed:
+        chrome = item.funcargs.get("navegador")
+        if chrome is not None:
             try:
-                ruta = guardar_captura(navegador, item.name)
-                copiar_captura_a_reportes(ruta)
+                ruta_imagen = sacar_captura(chrome, item.name)
+                copiar_captura_fallo(ruta_imagen)
 
-                # Se pasa la imagen en base64 para que quede dentro del HTML.
-                with open(ruta, "rb") as archivo:
+                # Convertimos la imagen a base64 para que quede metida dentro del HTML
+                with open(ruta_imagen, "rb") as archivo:
                     imagen_base64 = base64.b64encode(archivo.read()).decode("utf-8")
 
-                extras = getattr(report, "extras", [])
+                extras = getattr(reporte, "extras", [])
                 extras.append(pytest_html.extras.image(imagen_base64, "Captura del fallo"))
-                report.extras = extras
+                reporte.extras = extras
             except Exception as error:
-                logger.warning("No se pudo adjuntar la captura: %s", error)
+                registro.warning("No se pudo adjuntar la captura al reporte: %s", error)

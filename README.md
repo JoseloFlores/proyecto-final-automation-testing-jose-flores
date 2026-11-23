@@ -1,45 +1,45 @@
-# Proyecto Final — Automatización de Pruebas | SauceDemo
+# Proyecto Final — Automatizacion de Pruebas | SauceDemo
 
-Framework de automatización de pruebas para [SauceDemo](https://www.saucedemo.com),
-hecho con **Python, Selenium WebDriver, pytest y Requests**.
+Proyecto de automatizacion de pruebas para [SauceDemo](https://www.saucedemo.com),
+armado con **Python, Selenium WebDriver, pytest y Requests**.
 
-El proyecto incluye pruebas de interfaz, pruebas de API, Page Object Model,
-datos de prueba en JSON, reportes HTML, capturas automáticas, logging y
-ejecución automática con GitHub Actions.
+Incluye pruebas de interfaz grafica, pruebas de API, patron Page Object Model,
+datos de prueba en archivos JSON, reportes en HTML, capturas automaticas,
+registros de ejecucion y ejecucion automatica en GitHub Actions.
 
-**Autor:** José Flores
+**Autor:** Jose Flores
 
 ---
 
-## Propósito
+## Proposito
 
-El objetivo es automatizar los flujos principales de SauceDemo y algunos
-endpoints de una API pública, aplicando lo visto durante el curso:
+Automatizar los flujos principales de SauceDemo y varios endpoints de una API
+publica, aplicando los temas vistos en el curso:
 
-- Pruebas de UI con Selenium.
+- Pruebas de interfaz web con Selenium.
 - Pruebas de API con Requests.
-- Page Object Model para separar los tests de los localizadores.
-- Datos de prueba externos en archivos JSON.
-- Reportes HTML y capturas cuando un test falla.
-- Logging de los pasos importantes.
-- Integración continua con GitHub Actions.
+- Patron Page Object Model para separar los localizadores de las pruebas.
+- Datos de prueba en archivos JSON externos.
+- Reportes en HTML y capturas automaticas cuando una prueba falla.
+- Registros de pasos en consola y en archivo.
+- Integracion continua con GitHub Actions.
 
-La documentación complementaria de QA está en
-[`docs/informe_qa.md`](docs/informe_qa.md).
+El informe complementario de QA se encuentra en
+[`documentacion/informe_qa.md`](documentacion/informe_qa.md).
 
 ---
 
-## Tecnologías
+## Tecnologias usadas
 
-| Herramienta | Uso |
+| Herramienta | Para que se usa |
 |---|---|
 | Python 3.13 | Lenguaje principal |
-| Selenium WebDriver | Automatización del navegador |
-| pytest | Ejecución de los tests |
-| pytest-html | Reporte HTML |
+| Selenium WebDriver | Control del navegador Chrome |
+| pytest | Ejecucion de las pruebas |
+| pytest-html | Generacion del reporte en HTML |
 | Requests | Pruebas de API |
-| webdriver-manager | Descarga del ChromeDriver |
-| GitHub Actions | Ejecución automática en cada push |
+| webdriver-manager | Descarga automatica de ChromeDriver |
+| GitHub Actions | Ejecucion automatica en cada push |
 
 ---
 
@@ -47,41 +47,41 @@ La documentación complementaria de QA está en
 
 ```text
 .
-├── conftest.py                 # Fixture del navegador, capturas y hooks
-├── pytest.ini                  # Configuración de pytest, reporte y logs
+├── conftest.py                 # Apertura de Chrome, capturas y reporte
+├── pytest.ini                  # Configuracion de pytest, reporte y registros
 ├── requirements.txt
 ├── README.md
 ├── datos/
-│   ├── usuarios.json           # Usuarios válidos e inválidos
-│   └── checkout.json           # Datos de clientes para el checkout
-├── docs/
-│   ├── informe_qa.md           # Informe QA con el formato de entrega
+│   ├── usuarios.json           # Usuarios validos e invalidos
+│   └── compra.json             # Datos de clientes para el formulario de compra
+├── documentacion/
+│   ├── informe_qa.md           # Informe QA del proyecto
 │   └── evidencias/             # Capturas usadas en el informe
-├── pages/
-│   ├── base_page.py            # Acciones comunes
-│   ├── login_page.py
-│   ├── inventory_page.py
-│   ├── cart_page.py
-│   └── checkout_page.py
-├── tests/
-│   ├── test_login.py
-│   ├── test_carrito.py
-│   ├── test_inventario.py
-│   ├── test_checkout.py
-│   ├── test_responsive.py
-│   └── test_api.py
-├── utils/
-│   ├── config.py               # URLs, timeout y rutas
-│   ├── data_loader.py          # Lectura de JSON
-│   ├── api_client.py           # GET, POST y DELETE
-│   └── screenshots.py          # Capturas de evidencia
-├── logs/                       # Log de la ejecución
-└── reports/                    # Reporte HTML y capturas de fallos
+├── paginas/
+│   ├── pagina_base.py          # Acciones repetidas en todas las paginas
+│   ├── pagina_login.py         # Pantalla de inicio de sesion
+│   ├── pagina_inventario.py    # Listado de productos
+│   ├── pagina_carrito.py       # Carrito de compras
+│   └── pagina_compra.py        # Formulario y confirmacion de compra
+├── pruebas/
+│   ├── prueba_login.py
+│   ├── prueba_carrito.py
+│   ├── prueba_inventario.py
+│   ├── prueba_compra.py
+│   ├── prueba_responsivo.py
+│   └── prueba_api.py
+├── utilidades/
+│   ├── configuracion.py        # Direcciones, tiempos y carpetas
+│   ├── lector_datos.py         # Lectura de archivos JSON
+│   ├── cliente_api.py          # Funciones obtener, crear y eliminar
+│   └── capturas.py             # Guardado de imagenes de evidencia
+├── registros/                  # Archivo de log de la ejecucion
+└── reportes/                   # Reporte HTML y capturas de fallos
 ```
 
 ---
 
-## Requisitos
+## Requisitos previos
 
 - Python 3.10 o superior.
 - Google Chrome instalado.
@@ -89,7 +89,7 @@ La documentación complementaria de QA está en
 
 ---
 
-## Instalación
+## Instalacion
 
 ```bash
 python3 -m venv venv
@@ -97,7 +97,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-En Windows, la activación del entorno es:
+En Windows, el entorno virtual se activa asi:
 
 ```bash
 venv\Scripts\activate
@@ -105,154 +105,135 @@ venv\Scripts\activate
 
 ---
 
-## Ejecución de las pruebas
+## Como ejecutar las pruebas
 
-Ejecutar todo:
+Ejecutar todas las pruebas viendo la ventana de Chrome:
 
 ```bash
 pytest -v
 ```
 
-Ejecutar sin abrir la ventana de Chrome:
+Ejecutar todas las pruebas sin abrir ventana (modo sin pantalla):
 
 ```bash
-HEADLESS=true pytest -v
+SIN_VENTANA=true pytest -v
 ```
 
-Ejecutar solo las pruebas de UI:
+Ejecutar solo las pruebas de interfaz:
 
 ```bash
-pytest tests/test_login.py tests/test_carrito.py tests/test_inventario.py tests/test_checkout.py tests/test_responsive.py -v
+pytest pruebas/prueba_login.py pruebas/prueba_carrito.py pruebas/prueba_inventario.py pruebas/prueba_compra.py pruebas/prueba_responsivo.py -v
 ```
 
 Ejecutar solo las pruebas de API:
 
 ```bash
-pytest tests/test_api.py -v
+pytest pruebas/prueba_api.py -v
 ```
 
-Ejecutar un test puntual:
+Ejecutar una sola prueba:
 
 ```bash
-pytest tests/test_login.py::test_login_exitoso -v
+pytest pruebas/prueba_login.py::prueba_inicio_sesion_exitoso -v
 ```
 
-El reporte HTML se genera siempre en `reports/reporte.html`.
+El reporte HTML se guarda siempre en `reportes/reporte.html`.
 
 ---
 
-## Casos de prueba de UI
+## Casos de prueba de interfaz
 
-| Test | Qué valida |
+| Prueba | Que valida |
 |---|---|
-| `test_login_exitoso` | Login con `standard_user` y llegada al inventario. |
-| `test_login_fallido[usuario_bloqueado]` | Usuario bloqueado: muestra el error y no entra. |
-| `test_login_fallido[clave_incorrecta]` | Contraseña incorrecta: muestra el error y no entra. |
-| `test_agregar_producto` | Agrega el primer producto, badge en `1` y producto en el carrito. |
-| `test_quitar_producto` | Quita el producto, desaparece el badge y el carrito queda vacío. |
-| `test_ordenar_por_precio` | Ordena de menor a mayor y verifica los precios. |
-| `test_checkout_completo` | Compra completa con dos juegos de datos. |
-| `test_checkout_campos_obligatorios` | No deja continuar si falta el nombre. |
-| `test_responsive_paginas` | Flujo principal en desktop, tablet y móvil. |
+| `prueba_inicio_sesion_exitoso` | Ingreso con `standard_user` y llegada al inventario. |
+| `prueba_inicio_sesion_fallido[usuario_bloqueado]` | Usuario bloqueado: muestra mensaje de error y no entra. |
+| `prueba_inicio_sesion_fallido[clave_incorrecta]` | Clave incorrecta: muestra mensaje de error y no entra. |
+| `prueba_agregar_producto_al_carrito` | Agrega el primer producto, contador en `1` y producto visible en el carrito. |
+| `prueba_quitar_producto_del_carrito` | Quita el producto, desaparece el contador y el carrito queda vacio. |
+| `prueba_ordenar_productos_por_precio` | Ordena de menor a mayor y comprueba la lista de precios. |
+| `prueba_compra_completa` | Compra completa parametrizada con dos clientes. |
+| `prueba_compra_sin_datos_obligatorios` | Impide continuar si faltan los datos obligatorios. |
+| `prueba_flujo_en_distintas_pantallas` | Recorre el flujo en escritorio, tableta y celular. |
 
-Los datos de los usuarios y del checkout se leen desde `datos/*.json`.
+Los usuarios y clientes se leen desde `datos/usuarios.json` y `datos/compra.json`.
 
 ---
 
 ## Casos de prueba de API
 
-Se usa [JSONPlaceholder](https://jsonplaceholder.typicode.com), una API pública
-que no necesita clave.
+Se usa [JSONPlaceholder](https://jsonplaceholder.typicode.com), una API publica
+gratuita que no pide clave.
 
-| Test | Método | Qué valida |
+| Prueba | Metodo | Que valida |
 |---|---|---|
-| `test_get_post` | GET | Status 200 y estructura del post. |
-| `test_get_posts_por_usuario` | GET | Lista filtrada por `userId`. |
-| `test_crear_post` | POST | Status 201 y datos enviados. |
-| `test_crear_y_consultar` | GET + GET | Encadenamiento usuario → posts. |
-| `test_eliminar_post` | DELETE | Status 200 o 204. |
-| `test_post_inexistente` | GET | Status 404 para un post que no existe. |
+| `prueba_obtener_una_publicacion` | GET | Codigo 200 y campos de la publicacion. |
+| `prueba_obtener_publicaciones_de_usuario` | GET | Lista filtrada por `userId`. |
+| `prueba_crear_una_publicacion` | POST | Codigo 201 y datos devueltos en la respuesta. |
+| `prueba_obtener_usuario_y_sus_publicaciones` | GET + GET | Flujo encadenado: usuario y luego sus publicaciones. |
+| `prueba_eliminar_una_publicacion` | DELETE | Codigo 200 o 204. |
+| `prueba_buscar_publicacion_inexistente` | GET | Codigo 404 cuando el numero no existe. |
 
 ---
 
-## Reportes
+## Reportes y evidencias
 
-Después de ejecutar `pytest`, se generan estos archivos:
+Al terminar `pytest`, se generan estos archivos:
 
-| Archivo | Contenido |
+| Ubicacion | Contenido |
 |---|---|
-| `reports/reporte.html` | Reporte HTML con tests, estado y duración. |
-| `reports/screenshots/` | Capturas de los tests que fallaron. |
-| `docs/evidencias/` | Capturas de evidencia de todos los tests. |
-| `logs/ejecucion.log` | Log detallado de la ejecución. |
+| `reportes/reporte.html` | Reporte con pruebas ejecutadas, resultado y duracion. |
+| `reportes/capturas/` | Capturas de las pruebas que fallaron. |
+| `documentacion/evidencias/` | Capturas de evidencia de cada ejecucion. |
+| `registros/ejecucion.log` | Registro paso a paso de lo que hizo cada prueba. |
 
-El reporte es autocontenido: las capturas de los fallos quedan incrustadas
-dentro del HTML, no como archivos separados.
+El reporte es autocontenido: si una prueba falla, la captura queda incrustada
+dentro del archivo HTML.
 
-Para abrir el reporte:
+Para abrir el reporte en Linux:
 
 ```bash
-xdg-open reports/reporte.html
+xdg-open reportes/reporte.html
 ```
 
 En macOS:
 
 ```bash
-open reports/reporte.html
+open reportes/reporte.html
 ```
 
 ---
 
-## Capturas automáticas
+## Capturas automaticas
 
-Cada test guarda una captura al finalizar. Si el test falla, además se guarda
-una copia en `reports/screenshots/` y se adjunta al reporte HTML.
+Cada prueba guarda una captura al terminar. Si falla, ademas guarda una copia
+en `reportes/capturas/` y la pega en el reporte HTML.
 
-El nombre del archivo incluye la fecha, la hora y el nombre del test:
+Los nombres incluyen fecha, hora y nombre de la prueba, por ejemplo:
 
 ```text
-2026-11-22_12-59-01_test_login_exitoso.png
+2026-11-23_10-30-00_prueba_inicio_sesion_exitoso.png
 ```
 
 ---
 
-## Logging
+## Registros de ejecucion
 
-El archivo `logs/ejecucion.log` registra:
+El archivo `registros/ejecucion.log` guarda:
 
-- Inicio y cierre del navegador.
-- Usuario con el que se inicia sesión.
-- Producto que se agrega o se quita.
-- Navegación al carrito y al checkout.
-- Capturas guardadas.
-- Errores y advertencias.
-
-También se muestran los logs por consola durante la ejecución.
+- Cuando se abre y se cierra el navegador.
+- Que pagina se abre y con que usuario se inicia sesion.
+- Que producto se agrega o se quita.
+- El paso al carrito y al formulario de compra.
+- Donde se guardo cada captura.
+- Advertencias o errores.
 
 ---
 
-## Integración continua
+## Integracion continua
 
-El workflow `.github/workflows/pruebas.yml` se ejecuta en cada push o pull
-request a `main`.
-
-Hace lo siguiente:
-
-1. Instala Python y las dependencias.
-2. Ejecuta `pytest` en modo headless.
-3. Sube el reporte, los logs y las evidencias como artefactos.
-
----
-
-## Notas
-
-- SauceDemo tiene usuarios con errores intencionales (`problem_user`,
-  `performance_glitch_user`, `visual_user`, `error_user`). Esos usuarios se
-  usan en la exploración documentada en `docs/informe_qa.md`, no en la suite
-  principal.
-- Cada test crea su propio navegador, por eso son independientes.
-- Las credenciales de SauceDemo son públicas y están en `datos/usuarios.json`.
-- No se guardan contraseñas reales ni claves de API.
+El archivo `.github/workflows/pruebas.yml` corre las pruebas automaticamente
+cuando se hace un push o un pull request a `main`, usando `SIN_VENTANA=true`,
+y sube los reportes, registros y evidencias como artefacto.
 
 ---
 

@@ -1,4 +1,4 @@
-# Python
+# Archivos de Python
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -7,27 +7,27 @@ __pycache__/
 venv/
 .env
 
-# Reportes y evidencias generadas
-reports/*
-!reports/.gitkeep
-docs/evidencias/*
-!docs/evidencias/.gitkeep
-!docs/evidencias/TC-*.png
-!docs/evidencias/BUG-*.png
-!docs/evidencias/responsive_*.png
-logs/*
-!logs/.gitkeep
+# Reportes, registros y evidencias temporales
+reportes/*
+!reportes/.gitkeep
+documentacion/evidencias/*
+!documentacion/evidencias/.gitkeep
+!documentacion/evidencias/CP-*.png
+!documentacion/evidencias/ERROR-*.png
+!documentacion/evidencias/responsivo_*.png
+registros/*
+!registros/.gitkeep
 *.html
 
-# Selenium
+# Selenium y logs sueltos
 chromedriver
 chromedriver-linux64/
 *.log
 
-# Material de clase
+# Apuntes de clase
 *.pdf
 
-# OS / IDE
+# Sistema operativo y editor
 .DS_Store
 .vscode/
 .idea/

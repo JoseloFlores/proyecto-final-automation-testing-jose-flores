@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      HEADLESS: "true"
+      SIN_VENTANA: "true"
 
     steps:
       - name: Descargar el repositorio
@@ -31,13 +31,13 @@ jobs:
       - name: Ejecutar las pruebas
         run: pytest -v
 
-      - name: Subir reporte, logs y evidencias
+      - name: Subir reporte, registros y evidencias
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: reporte-pruebas
           path: |
-            reports/
-            logs/
-            docs/evidencias/
+            reportes/
+            registros/
+            documentacion/evidencias/
           if-no-files-found: ignore
