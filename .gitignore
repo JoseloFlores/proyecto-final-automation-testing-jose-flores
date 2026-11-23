@@ -8,13 +8,24 @@ venv/
 .env
 
 # Reportes y evidencias generadas
-reports/*.html
-reports/*.png
-reporte.html
+reports/*
+!reports/.gitkeep
+docs/evidencias/*
+!docs/evidencias/.gitkeep
+!docs/evidencias/TC-*.png
+!docs/evidencias/BUG-*.png
+!docs/evidencias/responsive_*.png
+logs/*
+!logs/.gitkeep
+*.html
 
 # Selenium
 chromedriver
+chromedriver-linux64/
 *.log
+
+# Material de clase
+*.pdf
 
 # OS / IDE
 .DS_Store
